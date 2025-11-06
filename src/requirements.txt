@@ -1,0 +1,5 @@
+pandas
+networkx
+matplotlib>=3.7
+haversine
+numpy

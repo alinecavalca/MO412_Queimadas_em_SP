@@ -1,0 +1,56 @@
+'''
+Visualize or analyze
+Subtask:
+Provide options for visualizing or analyzing the created network.
+'''
+import pickle
+import re
+from statistics import quantiles
+
+import networkx as nx
+import numpy as np
+from matplotlib import pyplot as plt
+
+
+def plot(graph, title="Network based on Latitude and Longitude"):
+  # Create a dictionary of positions for the nodes using Latitude and Longitude
+  pos = {node: (data['Longitude'], data['Latitude']) for node, data in graph.nodes(data=True)}
+
+  frp = np.array(list(data for node, data in graph.nodes(data="FRP")))
+  print(f"min frp = {min(frp)}")
+  print(f"max frp = {max(frp)}")
+  sizes = frp - min(frp) + 1 # min size 1
+  sizes = np.emath.power(sizes, 3/4 ) # max size is sizes**(3/4)
+  print(f"min sizes = {min(sizes)}")
+  print(f"max sizes = {max(sizes)}")
+
+  # Draw the network
+  plt.figure(figsize=(10, 8)) # Adjust figure size as needed
+  nx.draw(graph, pos, with_labels=False, node_size=sizes, edge_color='#27211e', alpha=0.6, node_color='#ff7966')
+  plt.title(title, fontsize=20)
+  plt.xlabel("Longitude")
+  plt.ylabel("Latitude")
+
+  # Create dummy scatter plots for the legend
+  # The 's' parameter in scatter corresponds to the area, so you might need to adjust for visual representation
+  # If your node_size in nx.draw is proportional to radius, then s should be proportional to radius^2
+  n = 1000
+  quantiles_pack = list(zip(quantiles(frp, n=n), quantiles(sizes, n=n)))
+  for i in range(0, n, n//10-1):
+    frp,size = quantiles_pack[i]
+    plt.scatter([], [], s=size, color='#ff7966', label=f'{frp:.0f}')
+
+  plt.legend(scatterpoints=1, frameon=False, labelspacing=2, reverse=True, title='FRP')
+  title = re.sub(r'[^\x00-\x7F]+', '', title)
+  title = title.replace(" ", "_")
+  #plt.show()
+  plt.savefig(f"../../data/{title}.png", bbox_inches="tight")
+
+if __name__ == "__main__":
+    with open("../../data/graph_1_10.gpickle", 'rb') as f:
+        G = pickle.load(f)
+        plot(G, "10 km de distância")
+
+    with open("../../data/graph_50.gpickle", 'rb') as f:
+        G1 = pickle.load(f)
+        plot(G1, "50 km de distância")
