@@ -30,21 +30,20 @@ def download_big_query(output_path):
     billing_id Project that will be billed. Find your Project ID here https://console.cloud.google.com/projectselector2/home/dashboard.
     :param output_path:
     """
-    # REPLCE WITH YOUR PROJECT ID
-    billing_id = "mo412-queimadas-em-sp"
+    # REPLACE WITH YOUR PROJECT ID
+    print("Enter your Project ID from google cloud console,\n"
+          "for reference check  https://basedosdados.org/docs/api_reference_python .\n"
+          "eg. mo412-queimadas-em-sp")
+    billing_id = input()
 
     query = """
         SELECT
-          `ano`,
           `dias_sem_chuva`,
           `latitude`,
           `longitude`,
-          `mes`,
           `potencia_radiativa_fogo`,
           `precipitacao`,
           `risco_fogo`,
-          `satelite`,
-          `sigla_uf`
         FROM
           `basedosdados.br_inpe_queimadas.microdados`
         WHERE
