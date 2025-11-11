@@ -3,3 +3,4 @@ networkx
 matplotlib>=3.7
 haversine
 numpy
+basedosdados~=2.0.2
