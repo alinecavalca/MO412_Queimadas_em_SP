@@ -1,11 +1,15 @@
 import pickle
+
+import networkx as nx
 from matplotlib import pyplot as plt
+import numpy as np
 
 if __name__ == "__main__":
     with open("../../data/graph_50.gpickle", 'rb') as f:
         G1 = pickle.load(f)
         # Calcular o grau de cada nó
         degrees = [d for _, d in G1.degree()]
+        mean_degree = np.mean(degrees)
 
         # Contar quantos nós têm cada grau
         degree_counts = {}
@@ -28,11 +32,74 @@ if __name__ == "__main__":
         plt.savefig(f"../../data/degree_distribution.png", bbox_inches="tight")
 
         plt.figure(figsize=(8, 5))
-        plt.hist(degrees, bins=range(max(degrees) + 1), color='skyblue', edgecolor='black', density=True)
+        plt.scatter(x,np.array(y)/G1.number_of_nodes(), color='skyblue')
+        plt.axvline(mean_degree, label='<k>', color='blue')
+        plt.legend()
         plt.xscale('log')
         plt.yscale('log')
-        plt.title("Degree Distribution (log-log scale)")
+        plt.title("Degree Probability (log-log scale)")
         plt.xlabel("Degree (k)")
         plt.ylabel("P(k)")
         plt.grid(alpha=0.3)
         plt.savefig(f"../../data/degree_distribution_log_log.png", bbox_inches="tight")
+
+        # 2. Mean Distance (Distância Média)
+        # Verifica se o grafo é conectado
+        if nx.is_connected(G1):
+            mean_distance = nx.average_shortest_path_length(G1)
+            print(f"Mean Distance: {mean_distance:.2f}")
+        else:
+            # Se não for conectado, calcula para o maior componente
+            largest_cc = max(nx.connected_components(G1), key=len)
+            G_largest = G1.subgraph(largest_cc).copy()
+            mean_distance = nx.average_shortest_path_length(G_largest)
+            print(f"Mean Distance (largest component): {mean_distance:.2f}")
+            print(f"  Note: Graph has {nx.number_connected_components(G1)} components")
+
+        # 3. Clustering Coefficient (Coeficiente de Agrupamento)
+        clustering_coeff = nx.average_clustering(G1)
+        print(f"Clustering Coefficient: {clustering_coeff:.4f}")
+
+        # Distribuição de Clustering Coefficient local
+        plt.figure(figsize=(8, 5))
+        local_clustering = nx.clustering(G1)
+        clustering_values = list(local_clustering.values())
+        plt.hist(clustering_values, bins=50, color='lightgreen', edgecolor='black', alpha=0.7)
+        plt.axvline(clustering_coeff, color='red', linestyle='--', linewidth=2,
+                    label=f'Mean: {clustering_coeff:.4f}')
+        plt.title("Local Clustering Coefficient Distribution")
+        plt.xlabel("Clustering Coefficient")
+        plt.ylabel("Frequency")
+        plt.legend()
+        plt.grid(alpha=0.3)
+        plt.savefig(f"../../data/clustering_distribution.png", bbox_inches="tight")
+
+        # 4. Betweenness Centrality (Centralidade de Intermediação)
+        betweenness = nx.betweenness_centrality(G1)
+        mean_betweenness = np.mean(list(betweenness.values()))
+        print(f"Mean Betweenness Centrality: {mean_betweenness:.6f}")
+        print("=" * 50)
+
+        # 3. Distribuição de Betweenness Centrality
+        plt.figure(figsize=(10, 5))
+        betweenness_values = sorted(betweenness.values(), reverse=True)
+        plt.plot(betweenness_values, linewidth=2, color='coral')
+        plt.title("Betweenness Centrality Distribution")
+        plt.xlabel("Node Rank")
+        plt.ylabel("Betweenness Centrality")
+        plt.grid(alpha=0.3)
+        plt.savefig(f"../../data/betweenness_distribution.png", bbox_inches="tight")
+
+        # Top 10 nós com maior Betweenness
+        plt.figure(figsize=(10, 6))
+        top_10_nodes = sorted(betweenness.items(), key=lambda x: x[1], reverse=True)[:10]
+        nodes, values = zip(*top_10_nodes)
+        plt.barh(range(len(nodes)), values, color='lightcoral', edgecolor='black')
+        plt.yticks(range(len(nodes)), [f"Node {n}" for n in nodes])
+        plt.xlabel("Betweenness Centrality")
+        plt.title("Top 10 Nodes by Betweenness Centrality")
+        plt.grid(alpha=0.3, axis='x')
+        plt.tight_layout()
+        plt.savefig(f"../../data/top_betweenness_nodes.png", bbox_inches="tight")
+
+
