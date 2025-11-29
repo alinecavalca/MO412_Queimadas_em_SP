@@ -1,8 +1,17 @@
 import pickle
+import configparser
+import logging
+import os
 
 import networkx as nx
 from matplotlib import pyplot as plt
 import numpy as np
+
+config_file = os.environ['CONFIG']
+config = configparser.ConfigParser()
+config.read(config_file)
+logging.basicConfig(level=config.get('DEFAULT', 'log_level'))
+log = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     with open("../../data/graph_50.gpickle", 'rb') as f:
@@ -47,18 +56,18 @@ if __name__ == "__main__":
         # Verifica se o grafo é conectado
         if nx.is_connected(G1):
             mean_distance = nx.average_shortest_path_length(G1)
-            print(f"Mean Distance: {mean_distance:.2f}")
+            log.info(f"Mean Distance: {mean_distance:.2f}")
         else:
             # Se não for conectado, calcula para o maior componente
             largest_cc = max(nx.connected_components(G1), key=len)
             G_largest = G1.subgraph(largest_cc).copy()
             mean_distance = nx.average_shortest_path_length(G_largest)
-            print(f"Mean Distance (largest component): {mean_distance:.2f}")
-            print(f"  Note: Graph has {nx.number_connected_components(G1)} components")
+            log.info(f"Mean Distance (largest component): {mean_distance:.2f}")
+            log.info(f"  Note: Graph has {nx.number_connected_components(G1)} components")
 
         # 3. Clustering Coefficient (Coeficiente de Agrupamento)
         clustering_coeff = nx.average_clustering(G1)
-        print(f"Clustering Coefficient: {clustering_coeff:.4f}")
+        log.info(f"Clustering Coefficient: {clustering_coeff:.4f}")
 
         # Distribuição de Clustering Coefficient local
         plt.figure(figsize=(8, 5))
@@ -77,8 +86,8 @@ if __name__ == "__main__":
         # 4. Betweenness Centrality (Centralidade de Intermediação)
         betweenness = nx.betweenness_centrality(G1)
         mean_betweenness = np.mean(list(betweenness.values()))
-        print(f"Mean Betweenness Centrality: {mean_betweenness:.6f}")
-        print("=" * 50)
+        log.info(f"Mean Betweenness Centrality: {mean_betweenness:.6f}")
+        log.info("=" * 50)
 
         # 3. Distribuição de Betweenness Centrality
         plt.figure(figsize=(10, 5))

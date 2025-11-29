@@ -3,6 +3,9 @@ Visualize or analyze
 Subtask:
 Provide options for visualizing or analyzing the created network.
 '''
+import configparser
+import logging
+import os
 import pickle
 import re
 from statistics import quantiles
@@ -11,18 +14,23 @@ import networkx as nx
 import numpy as np
 from matplotlib import pyplot as plt
 
+config_file = os.environ['CONFIG']
+config = configparser.ConfigParser()
+config.read(config_file)
+logging.basicConfig(level=config.get('DEFAULT', 'log_level'))
+log = logging.getLogger(__name__)
 
 def plot(graph, title="Network based on Latitude and Longitude"):
   # Create a dictionary of positions for the nodes using Latitude and Longitude
   pos = {node: (data['Longitude'], data['Latitude']) for node, data in graph.nodes(data=True)}
 
   frp = np.array(list(data for node, data in graph.nodes(data="FRP")))
-  print(f"min frp = {min(frp)}")
-  print(f"max frp = {max(frp)}")
+  log.info(f"min frp = {min(frp)}")
+  log.info(f"max frp = {max(frp)}")
   sizes = frp - min(frp) + 1 # min size 1
   sizes = np.emath.power(sizes, 3/4 ) # max size is sizes**(3/4)
-  print(f"min sizes = {min(sizes)}")
-  print(f"max sizes = {max(sizes)}")
+  log.info(f"min sizes = {min(sizes)}")
+  log.info(f"max sizes = {max(sizes)}")
 
   # Draw the network
   plt.figure(figsize=(10, 8)) # Adjust figure size as needed
@@ -49,8 +57,10 @@ def plot(graph, title="Network based on Latitude and Longitude"):
 if __name__ == "__main__":
     with open("../../data/graph_1_10.gpickle", 'rb') as f:
         G = pickle.load(f)
-        plot(G, "10 km de distância")
+        add_edges_distance = config.getint("generate", "add_edges_distance", fallback=10)
+        plot(G, f"{add_edges_distance} km de distância")
 
     with open("../../data/graph_50.gpickle", 'rb') as f:
         G1 = pickle.load(f)
-        plot(G1, "50 km de distância")
+        add_edges_distance = config.getint("generate", "add_edges_distance2", fallback=50)
+        plot(G1, f"{add_edges_distance} km de distância")

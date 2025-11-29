@@ -8,7 +8,7 @@ init:
 	mkdir -p ../data
 
 $(SUBDIRS):
-	$(MAKE) -C $@ $(rule)
+	export CONFIG="../config.ini"; $(MAKE) -C $@ $(rule)
 
 clean: $(SUBDIRSCLEAN)
 	rm -rf ../data

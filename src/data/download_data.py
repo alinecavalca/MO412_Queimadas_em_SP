@@ -1,7 +1,17 @@
+import configparser
+import logging
+import os
+
 import pandas as pd
 import requests
 from requests import HTTPError
 import basedosdados as bd
+
+config_file = os.environ['CONFIG']
+config = configparser.ConfigParser()
+config.read(config_file)
+log = logging.getLogger(__name__)
+log.setLevel(config.get('DEFAULT', 'log_level'))
 
 
 def download_csv(url, output_path):
@@ -21,7 +31,7 @@ def download_csv(url, output_path):
     with open(output_path, 'wb') as f:
         f.write(response.content)
 
-    print(f"CSV downloaded and saved to {output_path}")
+    log.info(f"CSV downloaded and saved to {output_path}")
 
 
 def download_big_query(output_path):
@@ -31,12 +41,16 @@ def download_big_query(output_path):
     :param output_path:
     """
     # REPLACE WITH YOUR PROJECT ID
-    print("Enter your Project ID from google cloud console,\n"
+    log.info("Enter your Project ID from google cloud console,\n"
           "for reference check  https://basedosdados.org/docs/api_reference_python .\n"
           "eg. mo412-queimadas-em-sp")
     billing_id = input()
 
-    query = """
+    year = config.getint("data", "year", 2024)
+    month = config.getint("data", "month", 9)
+    state = config.get("data", "state")
+    satellites = config.get("data", "satellites").split(",")
+    query = f"""
         SELECT
           `dias_sem_chuva`,
           `latitude`,
@@ -47,12 +61,13 @@ def download_big_query(output_path):
         FROM
           `basedosdados.br_inpe_queimadas.microdados`
         WHERE
-          (`ano` IN (2024))
-          AND (`mes` IN (9))
-          AND (`sigla_uf` IN ('SP'))
-          AND (`satelite` IN ('TERRA_M-M','TERRA_M-T'));
+          (`ano` IN ({year}))
+          AND (`mes` IN ({month}))
+          AND (`sigla_uf` IN ('{state}'))
+          AND (`satelite` IN ('{"','".join(satellites)}'));
             """
 
+    log.info(query)
     df = bd.read_sql(query=query, billing_project_id=billing_id)
     df.rename(columns={'longitude': 'Longitude', 'latitude': 'Latitude', 'potencia_radiativa_fogo': 'FRP'}, inplace=True)
     df.drop(columns=['sigla_uf', 'ano', 'mes', 'satelite'], inplace=True)
@@ -68,10 +83,12 @@ if __name__ == "__main__":
     try:
         download_csv(url, output_path=csv_file)
         df = pd.read_csv(csv_file)
+        if config.has_section("data"):
+            log.warning(f"Ignoring parameters at {config_file}")
     except HTTPError as e:
-        print(f"Error downloading CSV: {e}")
+        log.info(f"Error downloading CSV: {e}")
         df = download_big_query(output_path=csv_file)
 
-    print(df.describe())
+    log.info(df.describe())
 
 

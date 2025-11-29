@@ -1,8 +1,18 @@
+import configparser
+import logging
+import os
+
 import networkx as nx
 import pandas as pd
 from haversine import haversine, Unit
 from statistics import mean
 import pickle
+
+config_file = os.environ['CONFIG']
+config = configparser.ConfigParser()
+config.read(config_file)
+logging.basicConfig(level=config.get('DEFAULT', 'log_level'))
+log = logging.getLogger(__name__)
 
 '''
 Subtask:
@@ -75,7 +85,7 @@ def merge_close_nodes(graph, distance_threshold=1):
                 lats.append(graph.nodes[original_node]['Latitude'])
                 longs.append(graph.nodes[original_node]['Longitude'])
                 frp.append(graph.nodes[original_node]['FRP'])
-            #print(f"merged {len(frp)} into one node; lats = {lats} mean={mean(lats)}")
+            #log.info(f"merged {len(frp)} into one node; lats = {lats} mean={mean(lats)}")
             H.add_node(node_index, Latitude=mean(lats), Longitude=mean(longs), FRP=sum(frp))
           else:
             H.add_node(node_index, **node_data)
@@ -117,13 +127,15 @@ if __name__ == "__main__":
     for index, row in df.iterrows():
         G.add_node(index, Latitude=row['Latitude'], Longitude=row['Longitude'], FRP=row["FRP"])
 
-    G = merge_close_nodes(G)  # 1km default
-    # TODO export to config file
-    add_edges_by_distance(G)  # 10 km default
-    # TODO export to config file
+    merge_distance = config.getint("generate", "merge_distance", fallback=1)
+    G = merge_close_nodes(G, merge_distance)  # 1km default
+    log.info(f"merge distance = {merge_distance}")
+    add_edges_distance = config.getint("generate", "add_edges_distance", fallback=10)
+    log.info(f"add edges distance = {add_edges_distance}")
+    add_edges_by_distance(G, add_edges_distance)  # 10 km default
 
-    print(f"edges = {G.number_of_edges()}")
-    print(f"nodes = {G.number_of_nodes()}")
-    print(f"components = {nx.number_connected_components(G)}")
+    log.info(f"edges = {G.number_of_edges()}")
+    log.info(f"nodes = {G.number_of_nodes()}")
+    log.info(f"components = {nx.number_connected_components(G)}")
     with open("../../data/graph_1_10.gpickle", 'wb') as f:
         pickle.dump(G, f, pickle.HIGHEST_PROTOCOL)
