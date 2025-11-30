@@ -12,7 +12,7 @@ config = configparser.ConfigParser()
 config.read(config_file)
 
 logging.basicConfig(level=config.get('DEFAULT', 'log_level'))
-log = logging.getLogger(__name__)
+log = logging.getLogger(os.path.basename(__file__))
 
 def create_subgraph_from_edges(G):
 
