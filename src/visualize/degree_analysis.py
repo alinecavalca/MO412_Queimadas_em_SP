@@ -13,6 +13,37 @@ config.read(config_file)
 logging.basicConfig(level=config.get('DEFAULT', 'log_level'))
 log = logging.getLogger(os.path.basename(__file__))
 
+def robustness_analysis(G, strategy='targeted'):
+    """
+    Performs a robustness analysis by removing nodes and tracking the size of the largest connected component.
+
+    :param G: The graph to analyze.
+    :param strategy: 'targeted' (removes nodes by decreasing betweenness centrality) or 'random'.
+    :return: A list with the size of the largest connected component after each node removal.
+    """
+    g_copy = G.copy()
+    lcc_sizes = []
+
+    if strategy == 'targeted':
+        # Calcula uma vez betweenness centrality
+        nodes_to_remove = sorted(nx.betweenness_centrality(g_copy).items(), key=lambda item: item[1], reverse=True)
+        nodes_to_remove = [node for node, centrality in nodes_to_remove]
+    elif strategy == 'random':
+        nodes_to_remove = list(g_copy.nodes())
+        np.random.shuffle(nodes_to_remove)
+    else:
+        raise ValueError("A estrategia deve ser 'targeted' ou 'random'")
+
+    for node in nodes_to_remove:
+        g_copy.remove_node(node)
+        if g_copy.number_of_nodes() > 0:
+            largest_cc = max(nx.connected_components(g_copy), key=len)
+            lcc_sizes.append(len(largest_cc))
+        else:
+            lcc_sizes.append(0)
+    return lcc_sizes
+
+
 if __name__ == "__main__":
     with open("../../data/graph_50.gpickle", 'rb') as f:
         G1 = pickle.load(f)
@@ -92,7 +123,7 @@ if __name__ == "__main__":
         log.info(f"Mean Betweenness Centrality: {mean_betweenness:.6f}")
         log.info("=" * 50)
 
-        # 3. Distribuição de Betweenness Centrality
+        # Distribuição de Betweenness Centrality
         plt.figure(figsize=(10, 5))
         betweenness_values = sorted(betweenness.values(), reverse=True)
         plt.plot(betweenness_values, linewidth=2, color='coral')
@@ -113,5 +144,30 @@ if __name__ == "__main__":
         plt.grid(alpha=0.3, axis='x')
         plt.tight_layout()
         plt.savefig(f"../../data/top_betweenness_nodes.png", bbox_inches="tight")
+
+        # 5. Análise de Robustez
+        log.info("Starting robustness analysis...")
+
+        # Ataque direcionado baseado na centralidade de intermediação
+        lcc_targeted = robustness_analysis(G1, strategy='targeted')
+
+        # Falha aleatória
+        lcc_random = robustness_analysis(G1, strategy='random')
+
+        # Plotando os resultados
+        plt.figure(figsize=(10, 6))
+        num_nodes = G1.number_of_nodes()
+        fraction_removed = np.linspace(0, 1, num_nodes)
+
+        plt.plot(fraction_removed, np.array(lcc_targeted) / num_nodes, '#ff7966ff', label='Targeted Attack (by Betweenness)')
+        plt.plot(fraction_removed, np.array(lcc_random) / num_nodes, '#f5b073ff', label='Random Failure')
+
+        plt.title("Graph Robustness to Node Removal")
+        plt.xlabel("Fraction of Nodes Removed")
+        plt.ylabel("Fractional Size of Largest Connected Component")
+        plt.grid(alpha=0.3)
+        plt.legend()
+        plt.savefig(f"../../data/robustness_analysis.png", bbox_inches="tight")
+        log.info("Robustness analysis finished. Plot saved to ../../data/robustness_analysis.png")
 
 
