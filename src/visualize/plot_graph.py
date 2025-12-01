@@ -63,6 +63,26 @@ def plot(graph, title="Network based on Latitude and Longitude", img_src=None):
   #plt.show()
   plt.savefig(f"../../data/{title}.png", bbox_inches="tight")
 
+def plot_communities(graph, node_colors, title="Communities", img_src=None):
+    # Create a dictionary of positions for the nodes using Latitude and Longitude
+    pos = {node: (data['Longitude'], data['Latitude']) for node, data in graph.nodes(data=True)}
+
+    # Draw the network
+    fig, ax = plt.subplots(figsize=(18, 12))
+    longs = [p[0] for p in pos.values()]
+    lats = [p[1] for p in pos.values()]
+    if img_src:
+        img = plt.imread(img_src)
+        ax.imshow(img, extent=[-53.2, max(longs), -25.2, max(lats)])
+
+    nx.draw(graph, pos, with_labels=False, node_size=20, edge_color='#cccccc', alpha=0.7, node_color=node_colors)
+    plt.title(title, fontsize=20)
+    plt.xlabel("Longitude")
+    plt.ylabel("Latitude")
+
+    title = re.sub(r'[^\x00-\x7F]+', '', title).replace(" ", "_")
+    plt.savefig(f"../../data/{title}.png", bbox_inches="tight")
+
 if __name__ == "__main__":
     with open("../../data/graph_1_10.gpickle", 'rb') as f:
         G = pickle.load(f)
