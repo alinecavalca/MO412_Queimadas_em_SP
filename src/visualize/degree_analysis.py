@@ -19,6 +19,7 @@ if __name__ == "__main__":
         # Calcular o grau de cada nó
         degrees = [d for _, d in G1.degree()]
         mean_degree = np.mean(degrees)
+        log.info(f"Mean degree: {mean_degree:.4f}")
 
         # Contar quantos nós têm cada grau
         degree_counts = {}
@@ -37,6 +38,8 @@ if __name__ == "__main__":
         plt.title("Degree Distribution")
         plt.xlabel("Degree (k)")
         plt.ylabel("Number of Nodes")
+        plt.axvline(mean_degree, label='<k>', color='blue')
+        plt.legend()
         plt.grid(alpha=0.3)
         plt.savefig(f"../../data/degree_distribution.png", bbox_inches="tight")
 
@@ -61,7 +64,7 @@ if __name__ == "__main__":
             # Se não for conectado, calcula para o maior componente
             largest_cc = max(nx.connected_components(G1), key=len)
             G_largest = G1.subgraph(largest_cc).copy()
-            mean_distance = nx.average_shortest_path_length(G_largest)
+            mean_distance = nx.average_shortest_path_length(G_largest, weight="weight")
             log.info(f"Mean Distance (largest component): {mean_distance:.2f}")
             log.info(f"  Note: Graph has {nx.number_connected_components(G1)} components")
 

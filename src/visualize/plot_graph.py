@@ -20,7 +20,7 @@ config.read(config_file)
 logging.basicConfig(level=config.get('DEFAULT', 'log_level'))
 log = logging.getLogger(os.path.basename(__file__))
 
-def plot(graph, title="Network based on Latitude and Longitude"):
+def plot(graph, title="Network based on Latitude and Longitude", img_src=None):
   # Create a dictionary of positions for the nodes using Latitude and Longitude
   pos = {node: (data['Longitude'], data['Latitude']) for node, data in graph.nodes(data=True)}
 
@@ -33,7 +33,16 @@ def plot(graph, title="Network based on Latitude and Longitude"):
   log.info(f"max sizes = {max(sizes)}")
 
   # Draw the network
-  plt.figure(figsize=(10, 8)) # Adjust figure size as needed
+  fig, ax = plt.subplots(figsize=(18, 12))
+  longs = [p[0] for p in pos.values()]
+  lats = [p[1] for p in pos.values()]
+  log.info(f"min long = {min(longs)}")
+  log.info(f"max long = {max(longs)}")
+  log.info(f"min lat = {min(lats)}")
+  log.info(f"max lat = {max(lats)}")
+  if img_src:
+      img = plt.imread(img_src)
+      ax.imshow(img, extent=[-53.2, max(longs), -25.2, max(lats)])
   nx.draw(graph, pos, with_labels=False, node_size=sizes, edge_color='#27211e', alpha=0.6, node_color='#ff7966')
   plt.title(title, fontsize=20)
   plt.xlabel("Longitude")
@@ -46,7 +55,7 @@ def plot(graph, title="Network based on Latitude and Longitude"):
   quantiles_pack = list(zip(quantiles(frp, n=n), quantiles(sizes, n=n)))
   for i in range(0, n, n//10-1):
     frp,size = quantiles_pack[i]
-    plt.scatter([], [], s=size, color='#ff7966', label=f'{frp:.0f}')
+    plt.scatter([], [], s=size, color='#ffbcb3', label=f'{frp:.0f}')
 
   plt.legend(scatterpoints=1, frameon=False, labelspacing=2, reverse=True, title='FRP')
   title = re.sub(r'[^\x00-\x7F]+', '', title)
@@ -59,8 +68,12 @@ if __name__ == "__main__":
         G = pickle.load(f)
         add_edges_distance = config.getint("generate", "add_edges_distance", fallback=10)
         plot(G, f"{add_edges_distance} km de distância")
+        plot(G, f"{add_edges_distance} km de distância sobre Transporte", "Mapa_de_transportes_em_São_Paulo.jpg")
+        plot(G, f"{add_edges_distance} km de distância sobre Densidade Populacional", "SP_DensidadePopulacional.png")
 
     with open("../../data/graph_50.gpickle", 'rb') as f:
         G1 = pickle.load(f)
         add_edges_distance = config.getint("generate", "add_edges_distance2", fallback=50)
         plot(G1, f"{add_edges_distance} km de distância")
+        plot(G1, f"{add_edges_distance} km de distância sobre Transporte", "Mapa_de_transportes_em_São_Paulo.jpg")
+        plot(G1, f"{add_edges_distance} km de distância sobre Densidade Populacional", "SP_DensidadePopulacional.png")
