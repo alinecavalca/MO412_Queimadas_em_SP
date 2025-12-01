@@ -3,10 +3,13 @@ import logging
 import os
 
 import networkx as nx
+import numpy as np
 import pandas as pd
-from haversine import haversine, Unit
+from haversine import haversine, Unit, haversine_vector
 from statistics import mean
 import pickle
+
+from tqdm import tqdm
 
 config_file = os.environ['CONFIG']
 config = configparser.ConfigParser()
@@ -23,7 +26,7 @@ Reasoning: Define a function to calculate geographical distance between two node
 def add_edges_by_distance(graph, distance_threshold=10): # Distance in kilometers
     """Adds edges to a graph based on geographical distance between nodes."""
     nodes = list(graph.nodes(data=True))
-    for i in range(len(nodes)):
+    for i in tqdm(range(len(nodes)), desc="Add edges", total=len(nodes), unit="nodes"):
         for j in range(i + 1, len(nodes)):
             node1_index, node1_data = nodes[i]
             node2_index, node2_data = nodes[j]
@@ -75,7 +78,7 @@ def merge_close_nodes(graph, distance_threshold=1):
 
     # Create a new graph with merged nodes
     H = nx.Graph()
-    for node_index, node_data in graph.nodes(data=True):
+    for node_index, node_data in tqdm(graph.nodes(data=True), desc="Merge step 2", total=len(graph.nodes), unit="nodes"):
         if node_index not in nodes_to_merge:
           if node_index in merged_nodes:
             lats = []
@@ -91,7 +94,7 @@ def merge_close_nodes(graph, distance_threshold=1):
             H.add_node(node_index, **node_data)
 
     # Add edges to the new graph
-    for edge in graph.edges(data=True):
+    for edge in tqdm(graph.edges(data=True), desc="Merge step 3", total=len(graph.edges), unit="edges"):
         u, v, data = edge
         if u not in nodes_to_merge and v not in nodes_to_merge:
             H.add_edge(u, v, **data)

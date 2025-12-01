@@ -20,7 +20,7 @@ def create_subgraph_from_edges(G):
 
   largest_cc = max(nx.connected_components(G), key=len)
   log.info(f"largest cc = {len(largest_cc)}")
-  #To create the induced subgraph of each component use:
+  #To create the induced subgraph of each component, use:
   S = [G.subgraph(c).copy() for c in nx.connected_components(G)]
 
   H = nx.Graph()
@@ -44,7 +44,6 @@ if __name__ == "__main__":
         add_edges_distance = config.getint("generate", "add_edges_distance2", fallback=50)
         log.info(f"add edges distance = {add_edges_distance}")
         add_edges_by_distance(G1, add_edges_distance)  # 10 km default
-        # TODO export to config file
 
         log.info(f"edges = {G1.number_of_edges()}")
         log.info(f"nodes = {G1.number_of_nodes()}")
