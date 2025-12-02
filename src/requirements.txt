@@ -6,3 +6,4 @@ numpy
 tqdm
 basedosdados~=2.0.2
 EoN
+Pillow

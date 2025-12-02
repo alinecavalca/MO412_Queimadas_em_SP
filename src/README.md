@@ -10,12 +10,62 @@ O código está organizado nos seguintes subdiretórios, que representam as etap
 - **/generate**: Scripts para construir o grafo a partir dos dados processados, salvando o objeto do grafo em formato `.gpickle`.
 - **/visualize**: Scripts para realizar as análises sobre o grafo gerado, produzindo visualizações (gráficos, mapas, animações) e relatórios.
 
-## Pré-requisitos
+## Execução com Makefile (Modo Automatizado)
+
+Este projeto inclui um Makefile principal em src/ que automatiza toda a pipeline: instalação de dependências, processamento de dados, geração do grafo e análises.
+O Makefile também chama automaticamente os Makefiles dos subdiretórios.
+
+### 🔧 make all
+
+Para executar todo o pipeline com um único comando:
+
+```bash
+make all
+```
+
+O que esse comando faz:
+
+1. Instala dependências via pip install -r requirements.txt.
+
+2. Cria o diretório data/ onde ficarão logs, resultados e arquivos intermediários.
+
+3. Copia o arquivo config.ini para data/ para registrar com qual configuração a execução foi realizada.
+
+4. Entra automaticamente nos diretórios data_processing, generate e visualize, executando o make correspondente de cada um.
+
+5. Durante a execução:
+
+    * a variável de ambiente CONFIG é exportada para cada subdiretório;
+
+    * toda saída (stdout e stderr) é registrada em data/log.txt, além de aparecer na tela.
+
+Em outras palavras, o comando caminha pelos subdiretórios e executa seu conteúdo automaticamente, mantendo um log completo da execução.
+
+### 🧹 make clean
+
+Para limpar todos os artefatos gerados:
+
+```bash
+make clean
+```
+
+Esse comando:
+
+* chama make clean dentro de cada subdiretório (data_processing, generate, visualize);
+
+* remove completamente o diretório data/, apagando resultados, logs e arquivos temporários.
+
+
+## Execução Manual (Sem Makefile)
+
+Caso o usuário prefira executar cada etapa manualmente, basta seguir a ordem lógica do pipeline:
+
+### Pré-requisitos
 
 Antes de executar os scripts, certifique-se de que você tem o Python 3 instalado e as seguintes bibliotecas:
 
 ```bash
-pip install networkx matplotlib numpy pandas EoN tqdm pillow
+pip install -r requirements.txt
 ```
 
 ## Configuração
@@ -52,4 +102,4 @@ A execução deve seguir a ordem lógica do processamento de dados.
     make
     ```
 
-Todos os resultados (imagens, GIFs) serão salvos no diretório `data/`.
+Todos os resultados serão salvos no diretório `data/`.

@@ -34,6 +34,8 @@ if __name__ == "__main__":
 
     # Escolher um nó aleatório para começar o incêndio
     # Usamos o mesmo nó inicial para todas as simulações para uma comparação justa
+    # TODO: Idealmente seria interessante usar as datas do conjunto de dados para escolher os nós iniciais
+    # e usar essas datas para ver como é a propagação de fato.
     initial_infected_node = random.choice(list(G.nodes()))
 
     log.info(f"Graph has {G.number_of_nodes()} nodes.")
