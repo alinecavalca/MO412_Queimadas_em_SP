@@ -1,13 +1,13 @@
-# Módulo de Geração de Grafo
+# Graph Generation Module
 
-Este diretório contém os scripts para construir a rede (grafo) a partir dos dados de queimadas processados.
+This directory contains the scripts to build the network (graph) from the processed wildfire data.
 
-## Funcionalidade
+## Functionality
 
-O script principal (`generate_graph.py`) lê os dados limpos e realiza as seguintes ações:
+The main script (`gen_graph.py`) reads the cleaned data and performs the following actions:
 
-1.  Cria um nó para cada foco de queimada, armazenando seus atributos (Latitude, Longitude, FRP, etc.).
-2.  Adiciona arestas entre os nós com base em um critério de proximidade geográfica (ex: todos os focos a menos de 50 km de distância). O peso da aresta pode representar a distância inversa.
-3.  Salva o objeto do grafo `networkx` final em um arquivo `.gpickle` no diretório `data/`. Este arquivo é o principal insumo para todos os scripts de análise e visualização.
+1.  Creates a node for each wildfire focus, storing its attributes (Latitude, Longitude, FRP, etc.).
+2.  Adds edges between nodes based on a geographical proximity criterion (e.g., all focuses less than 50 km apart). The edge weight can represent the inverse distance.
+3.  Saves the final `networkx` graph object in a `.gpickle` file in the `data/` directory. This file is the primary input for all analysis and visualization scripts.
 
-A distância para a criação de arestas é configurável através do arquivo `config.ini`.
+The distance for creating edges is configurable via the `config.ini` file.

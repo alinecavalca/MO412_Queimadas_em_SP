@@ -1,13 +1,13 @@
-# Módulo de Processamento de Dados
+# Data Processing Module
 
-Este diretório contém os scripts responsáveis pela coleta e limpeza dos dados de focos de queimada.
+This directory contains the scripts responsible for collecting and cleaning wildfire focus data.
 
-## Funcionalidade
+## Functionality
 
-O principal objetivo deste módulo é transformar os dados brutos, geralmente obtidos de fontes como o INPE (Instituto Nacional de Pesquisas Espaciais), em um formato estruturado e limpo, pronto para a modelagem em grafo.
+The main objective of this module is to transform raw data, usually obtained from sources like INPE (National Institute for Space Research), into a structured and clean format, ready for graph modeling.
 
-As principais etapas realizadas pelos scripts aqui são:
-- Download dos dados de focos de queimada para o período de interesse.
-- Filtragem dos dados para o estado de São Paulo.
-- Limpeza de dados ausentes ou inconsistentes.
-- Salvamento dos dados processados em um formato intermediário (ex: `.csv` ou `.parquet`) no diretório `data/`.
+The main steps performed by the scripts here are:
+- Downloading wildfire focus data for the period of interest.
+- Filtering data for the state of São Paulo.
+- Cleaning missing or inconsistent data.
+- Saving processed data in an intermediate format (e.g., `.csv` or `.parquet`) in the `data/` directory.

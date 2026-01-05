@@ -1,53 +1,52 @@
-# Módulo de Análise e Visualização de Grafos
+# Graph Analysis and Visualization Module
 
-Este diretório contém os scripts para analisar o grafo de focos de queimada e gerar visualizações. Cada script foca em um tipo diferente de análise, fornecendo insights sobre a estrutura da rede, sua robustez e a dinâmica de propagação de incêndios.
+This directory contains the scripts to analyze the wildfire focus graph and generate visualizations. Each script focuses on a different type of analysis, providing insights into the network structure, its robustness, and fire propagation dynamics.
 
-## Scripts de Análise
+## Analysis Scripts
 
-Abaixo está a descrição de cada script e o que ele produz. Para executar todos de uma vez, utilize o comando `make` neste diretório.
+Below is the description of each script and what it produces. To run all of them at once, use the `make` command in this directory.
 
 - **`plot_graph.py`**:
-  - **O que faz:** Gera uma visualização geográfica básica do grafo, plotando os focos de queimada (nós) em suas coordenadas de latitude e longitude.
-  - **Resultado:** Um mapa da rede salvo em `data/`.
+  - **What it does:** Generates a basic geographic visualization of the graph, plotting wildfire focuses (nodes) at their latitude and longitude coordinates.
+  - **Result:** A network map saved in `data/`.
 
 - **`degree_analysis.py`**:
-  - **O que faz:** Realiza uma análise estrutural completa da rede, calculando e plotando métricas como distribuição de grau, coeficiente de agrupamento e centralidade de intermediação. Também executa uma análise de robustez, simulando a remoção de nós e medindo o impacto na conectividade da rede.
-  - **Resultados:** Gráficos de distribuição, um gráfico de análise de robustez e logs com as principais métricas.
+  - **What it does:** Performs a complete structural analysis of the network, calculating and plotting metrics such as degree distribution, clustering coefficient, and betweenness centrality. It also executes a robustness analysis, simulating node removal and measuring the impact on network connectivity.
+  - **Results:** Distribution plots, a robustness analysis plot, and logs with key metrics.
 
 - **`community_analysis.py`**:
-  - **O que faz:** Aplica o algoritmo de Louvain para detectar "comunidades" ou "clusters" de focos de incêndio densamente conectados.
-  - **Resultado:** Um mapa da rede onde cada comunidade é colorida de forma distinta, ajudando a identificar "zonas de risco".
+  - **What it does:** Applies the Louvain algorithm to detect "communities" or "clusters" of densely connected fire focuses.
+  - **Result:** A network map where each community is colored differently, helping to identify "risk zones".
 
 - **`propagation_analysis.py`**:
-  - **O que faz:** Utiliza o modelo epidemiológico **SIR (Suscetível-Infectado-Recuperado)** para simular a propagação de um incêndio. Realiza uma análise de sensibilidade para diferentes taxas de propagação (`tau`).
-  - **Resultado:** Gráficos que mostram a evolução do número de nós suscetíveis, queimando e queimados ao longo do tempo para diferentes cenários.
-  (É um experimento inicial, idealmente deve ser feito uma melhoria, e utilizar dados de data do dataset e outras informações para obter um resultado mais realista, e também seria interessante cruzar com outras informações para ver os reais impactos.)
+  - **What it does:** Uses the **SIR (Susceptible-Infected-Recovered)** epidemiological model to simulate fire propagation. Performs a sensitivity analysis for different propagation rates (`tau`).
+  - **Result:** Graphs showing the evolution of the number of susceptible, burning, and burnt nodes over time for different scenarios.
+  (This is an initial experiment; ideally, improvements should be made, using date data from the dataset and other information to achieve a more realistic result. It would also be interesting to cross-reference with other information to see the real impacts.)
 
 - **`find_critical_nodes.py`**:
-  - **O que faz:** Executa a análise mais crítica do ponto de vista prático. Simula um incêndio começando em *cada nó* da rede e mede o tamanho final do estrago.
-  - **Resultado:** Identifica e destaca em um mapa os **5 pontos de ignição mais perigosos** — aqueles que, se um incêndio começar ali, têm o maior potencial de causar um desastre em larga escala.
+  - **What it does:** Performs the most critical analysis from a practical standpoint. It simulates a fire starting at *each node* of the network and measures the final size of the damage.
+  - **Result:** Identifies and highlights on a map the **5 most dangerous ignition points** — those that, if a fire starts there, have the greatest potential to cause a large-scale disaster.
 
 - **`animate_propagation.py`**:
-  - **O que faz:** Gera animações (GIFs) que mostram a propagação do fogo no mapa geográfico para diferentes cenários de `tau`.
-  - **Resultado:** Arquivos `.gif` que visualizam a dinâmica do incêndio.
-  (É um experimento inicial, idealmente deve ser feito uma melhoria, e utilizar dados de data do dataset e outras informações para obter um resultado mais realista, e também seria interessante cruzar com outras informações para ver os reais impactos.)
+  - **What it does:** Generates animations (GIFs) showing fire propagation on the geographic map for different `tau` scenarios.
+  - **Result:** `.gif` files visualizing fire dynamics.
+  (This is an initial experiment; ideally, improvements should be made, using date data from the dataset and other information to achieve a more realistic result. It would also be interesting to cross-reference with other information to see the real impacts.)
 
 - **`animate_community_propagation.py`**:
-  - **O que faz:** Combina a detecção de comunidades com a simulação de propagação para criar uma animação avançada.
-  - **Resultado:** Uma animação `.gif` que mostra o fogo se espalhando dentro e entre as diferentes zonas de risco (comunidades).
-  (É um experimento inicial, idealmente deve ser feito uma melhoria, e utilizar dados de data do dataset e outras informações para obter um resultado mais realista, e também seria interessante cruzar com outras informações para ver os reais impactos.)
+  - **What it does:** Combines community detection with propagation simulation to create an advanced animation.
+  - **Result:** A `.gif` animation showing fire spreading within and between different risk zones (communities).
+  (This is an initial experiment; ideally, improvements should be made, using date data from the dataset and other information to achieve a more realistic result. It would also be interesting to cross-reference with other information to see the real impacts.)
 
-## Como Executar
+## How to Run
 
-Certifique-se de que o arquivo `graph_50.gpickle` existe no diretório `data/`.
+Ensure the `graph_50.gpickle` file exists in the `data/` directory.
 
-Para rodar todos os scripts de análise em sequência:
+To run all analysis scripts in sequence:
 ```bash
 make
 ```
 
-Para limpar todos os arquivos gerados:
+To clean all generated files:
 ```bash
 make clean
 ```
-

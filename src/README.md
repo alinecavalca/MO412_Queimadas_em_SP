@@ -1,105 +1,105 @@
-# Análise de Focos de Queimada em SP com Teoria de Grafos
+# Wildfire Focus Analysis in SP with Graph Theory
 
-Este diretório contém o código-fonte para o projeto de análise da rede de focos de queimada no estado de São Paulo. O objetivo é utilizar a teoria de grafos para modelar a relação entre os focos de incêndio, identificar pontos críticos e simular a propagação do fogo.
+This directory contains the source code for the project analyzing the network of wildfire focuses in the state of São Paulo. The goal is to use graph theory to model the relationship between fire focuses, identify critical points, and simulate fire propagation.
 
-## Estrutura dos Diretórios
+## Directory Structure
 
-O código está organizado nos seguintes subdiretórios, que representam as etapas do pipeline de análise:
+The code is organized into the following subdirectories, which represent the stages of the analysis pipeline:
 
-- **/data_processing**: Scripts para baixar, limpar e formatar os dados brutos de focos de queimada.
-- **/generate**: Scripts para construir o grafo a partir dos dados processados, salvando o objeto do grafo em formato `.gpickle`.
-- **/visualize**: Scripts para realizar as análises sobre o grafo gerado, produzindo visualizações (gráficos, mapas, animações) e relatórios.
+- **/data**: Scripts to download, clean, and format the raw wildfire focus data.
+- **/generate**: Scripts to build the graph from the processed data, saving the graph object in `.gpickle` format.
+- **/visualize**: Scripts to perform analysis on the generated graph, producing visualizations (graphs, maps, animations) and reports.
 
-## Execução com Makefile (Modo Automatizado)
+## Execution with Makefile (Automated Mode)
 
-Este projeto inclui um Makefile principal em src/ que automatiza toda a pipeline: instalação de dependências, processamento de dados, geração do grafo e análises.
-O Makefile também chama automaticamente os Makefiles dos subdiretórios.
+This project includes a main Makefile in `src/` that automates the entire pipeline: dependency installation, data processing, graph generation, and analysis.
+The Makefile also automatically calls the Makefiles in the subdirectories.
 
 ### 🔧 make all
 
-Para executar todo o pipeline com um único comando:
+To execute the entire pipeline with a single command:
 
 ```bash
 make all
 ```
 
-O que esse comando faz:
+What this command does:
 
-1. Instala dependências via pip install -r requirements.txt.
+1. Installs dependencies via `pip install -r requirements.txt`.
 
-2. Cria o diretório data/ onde ficarão logs, resultados e arquivos intermediários.
+2. Creates the `data/` directory where logs, results, and intermediate files will be stored.
 
-3. Copia o arquivo config.ini para data/ para registrar com qual configuração a execução foi realizada.
+3. Copies the `config.ini` file to `data/` to record which configuration the execution was performed with.
 
-4. Entra automaticamente nos diretórios data_processing, generate e visualize, executando o make correspondente de cada um.
+4. Automatically enters the `data`, `generate`, and `visualize` directories, executing the corresponding `make` for each.
 
-5. Durante a execução:
+5. During execution:
 
-    * a variável de ambiente CONFIG é exportada para cada subdiretório;
+    * the `CONFIG` environment variable is exported to each subdirectory;
 
-    * toda saída (stdout e stderr) é registrada em data/log.txt, além de aparecer na tela.
+    * all output (stdout and stderr) is recorded in `data/log.txt`, in addition to appearing on the screen.
 
-Em outras palavras, o comando caminha pelos subdiretórios e executa seu conteúdo automaticamente, mantendo um log completo da execução.
+In other words, the command walks through the subdirectories and executes their content automatically, maintaining a complete log of the execution.
 
 ### 🧹 make clean
 
-Para limpar todos os artefatos gerados:
+To clean all generated artifacts:
 
 ```bash
 make clean
 ```
 
-Esse comando:
+This command:
 
-* chama make clean dentro de cada subdiretório (data_processing, generate, visualize);
+* calls `make clean` inside each subdirectory (`data`, `generate`, `visualize`);
 
-* remove completamente o diretório data/, apagando resultados, logs e arquivos temporários.
+* completely removes the `data/` directory, deleting results, logs, and temporary files.
 
 
-## Execução Manual (Sem Makefile)
+## Manual Execution (Without Makefile)
 
-Caso o usuário prefira executar cada etapa manualmente, basta seguir a ordem lógica do pipeline:
+If the user prefers to execute each step manually, simply follow the logical order of the pipeline:
 
-### Pré-requisitos
+### Prerequisites
 
-Antes de executar os scripts, certifique-se de que você tem o Python 3 instalado e as seguintes bibliotecas:
+Before running the scripts, ensure you have Python 3 installed and the following libraries:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Configuração
+## Configuration
 
-O projeto utiliza um arquivo de configuração para gerenciar parâmetros como caminhos de arquivos, níveis de log e parâmetros de análise. Antes de executar, você deve exportar a variável de ambiente `CONFIG` apontando para o seu arquivo de configuração.
+The project uses a configuration file to manage parameters such as file paths, log levels, and analysis parameters. Before executing, you must export the `CONFIG` environment variable pointing to your configuration file.
 
 ```bash
-# Exemplo de como configurar no terminal
-export CONFIG=/caminho/completo/para/o/seu/config.ini
+# Example of how to configure in the terminal
+export CONFIG=/full/path/to/your/config.ini
 ```
 
-## Como Executar o Pipeline
+## How to Run the Pipeline
 
-A execução deve seguir a ordem lógica do processamento de dados.
+The execution must follow the logical order of data processing.
 
-1.  **Processar os Dados:**
-    Navegue até `src/data_processing` e execute o script principal para obter os dados limpos.
+1.  **Process Data:**
+    Navigate to `src/data` and run the main script to get the cleaned data.
     ```bash
-    cd src/data_processing
-    python process_data.py # (ou o nome do seu script principal aqui)
+    cd src/data
+    python download_data.py
     ```
 
-2.  **Gerar o Grafo:**
-    Com os dados limpos, gere o arquivo `.gpickle` que representa a rede.
+2.  **Generate the Graph:**
+    With the cleaned data, generate the `.gpickle` file that represents the network.
     ```bash
     cd ../generate
-    python generate_graph.py # (ou o nome do seu script principal aqui)
+    python gen_graph.py
     ```
 
-3.  **Realizar Análises e Visualizações:**
-    Com o grafo pronto, execute as análises. O `Makefile` no diretório `visualize` automatiza a execução de todos os scripts de análise.
+3.  **Perform Analysis and Visualizations:**
+    With the graph ready, run the analyses. The `Makefile` in the `visualize` directory automates the execution of all analysis scripts.
     ```bash
     cd ../visualize
     make
     ```
 
-Todos os resultados serão salvos no diretório `data/`.
+All results will be saved in the `data/` directory.
